@@ -3,6 +3,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <constants.hpp>
+#include <generator.h>
+#include <unistd.h>
 
 int main()
 {
@@ -25,16 +27,27 @@ int main()
     // Setup multicast IP address for sending data
     sockaddr_in dest_addr{};
     dest_addr.sin_family = AF_INET;
-    dest_addr.sin_port = htons(PORT); // Convert host architecture storage to big endian (network order)
+    dest_addr.sin_port = htons(PORT); // Convert host (little/big endian) to big endian (network order)
     int rcode = inet_pton(AF_INET, MULTICAST_IP, &dest_addr.sin_addr);
 
     if (rcode == 0) {
-        perror("Binary form of IPv4 multicast address %s not converted properly.\n");
+        fprintf(stderr, "Binary form of IPv4 multicast address %s not converted properly.\n", MULTICAST_IP);
         return 1;
     } else if (rcode == -1) {
         perror("Failed to create binary form of IPv4 multicast address.\n");
     }
 
+    // Send data to socket
+    while(1) {
+        AddOrderMessage a = generateAddOrderMessage();
+        ssize_t sent = sendto(sockfd, &a, sizeof(a), 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
 
+        if(sent < 0) {
+            perror("Could not send data");
+        } else {
+            fprintf(stdout, "Sent message of size %d and type %c", sizeof(a), a.messageType);
+        }
+        sleep(1);
+    }
     return 0;
 }
