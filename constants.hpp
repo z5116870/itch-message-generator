@@ -1,3 +1,0 @@
-// NETWORK CONSTANTS
-#define MULTICAST_IP "239.1.1.1"
-#define PORT 30001

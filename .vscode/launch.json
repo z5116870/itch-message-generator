@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug itch_gen",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/itch_gen",  // path to your executable
+      "args": [],  // add arguments if needed
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "build",
+      "miDebuggerPath": "/usr/bin/gdb",  // Adjust if GDB is elsewhere
+      "logging": {
+        "engineLogging": false
+      }
+    }
+  ]
+}
