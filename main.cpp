@@ -45,13 +45,12 @@ int main()
     // Send data to socket
     while(1) {
         AddOrderMessage a = generateAddOrderMessage();
-        std::cout << "created test message\n";
         ssize_t sent = sendto(sockfd, &a, sizeof(a), 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
 
         if(sent < 0) {
             perror("Could not send data");
         } else {
-            fprintf(stdout, "Sent message of size %ld and type %c", sizeof(a), a.messageType);
+            fprintf(stdout, "Sent message of size %ld and type %c, %ld", sizeof(a), a.messageType, a.timestamp);
         }
         sleep(1);
     }

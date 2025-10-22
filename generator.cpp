@@ -10,8 +10,7 @@ AddOrderMessage generateAddOrderMessage() {
     m.messageType = 'A';
     m.timestamp = getNanoSecondsSinceMidnight();
     setRandomOrderId(m.orderRefNumber);
-    m.buySellIndicator = buySellCharRndmzr();
-    std::cout << "idx" << std::endl;
+    m.buySellIndicator = charRndmzr('B', 'S');
     m.shares = ranInt32();
     setRandomTicker(m.stock);
     m.price = ranInt32();
@@ -22,6 +21,8 @@ OrderExecutedMessage generateOrderExecutedMessage() {
     OrderExecutedMessage m;
     m.messageType = 'E';
     m.timestamp = getNanoSecondsSinceMidnight();
+    setRandomOrderId(m.orderRefNumber);
+    m.executedShares = ranInt32();
     return m;
 }
 
@@ -29,6 +30,10 @@ OrderExecutedWithPriceMessage generateOrderExecutedWithPriceMessage() {
     OrderExecutedWithPriceMessage m;
     m.messageType = 'E';
     m.timestamp = getNanoSecondsSinceMidnight();
+    setRandomOrderId(m.orderRefNumber);
+    m.executedShares = ranInt32();
+    m.printable = charRndmzr('Y', 'N');
+    m.executionPrice = ranInt32();
     return m;
 }
 
@@ -36,6 +41,7 @@ SystemEventMessage generateSystemEventMessage() {
     SystemEventMessage m;
     m.messageType = 'E';
     m.timestamp = getNanoSecondsSinceMidnight();
+    m.eventCode = charRndmzr('O', 'C');
     return m;
 }
 
@@ -43,6 +49,8 @@ OrderCancelMessage generateOrderCancelMessage() {
     OrderCancelMessage m;
     m.messageType = 'E';
     m.timestamp = getNanoSecondsSinceMidnight();
+    setRandomOrderId(m.orderRefNumber);
+    m.cancelledShares = ranInt32();
     return m;
 }
 
@@ -50,6 +58,11 @@ TradeMessage generateTradeMessage() {
     TradeMessage m;
     m.messageType = 'E';
     m.timestamp = getNanoSecondsSinceMidnight();
+    setRandomOrderId(m.orderRefNumber);
+    m.buySellIndicator = charRndmzr('B', 'S');
+    m.shares = ranInt32();
+    setRandomTicker(m.stock);
+    m.price = ranInt32();
     return m;
 }
 
@@ -68,11 +81,11 @@ uint32_t ranInt32() {
     return dist(gen);
 }
 
-char buySellCharRndmzr() {
+char charRndmzr(char x, char y) {
     std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<int> dist(0,1);
     int bit = dist(gen);
-    return bit ? 'B' : 'S';
+    return bit ? x : y;
 }
 
 void setRandomOrderId(uint64_t &x) {
@@ -83,7 +96,6 @@ void setRandomOrderId(uint64_t &x) {
     };
     std::uniform_int_distribution<int> dist(0,orderIds.size() - 1);
     int idx = dist(gen);
-    std::cout << idx << std::endl;
     x = orderIds[dist(gen)];
 }
 

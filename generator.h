@@ -12,6 +12,8 @@ inline const char* tickers[] = {
     "AAPL", "MSFT", "GOOGL", "BTC", "ETH", "GALA", "NVDA", "META", "VET", "XRP", "SOL", "DOGE"
 };
 
+
+
 // ITCH MESSAGE TYPES
 struct AddOrderMessage {
     char        messageType;
@@ -28,7 +30,6 @@ struct OrderExecutedMessage {
     uint64_t timestamp;
     uint64_t orderRefNumber;
     uint32_t executedShares;
-    uint64_t matchNumber;
 };
 
 struct OrderExecutedWithPriceMessage {
@@ -36,7 +37,6 @@ struct OrderExecutedWithPriceMessage {
     uint64_t timestamp;
     uint64_t orderRefNumber;
     uint32_t executedShares;
-    uint64_t matchNumber;
     char printable;
     uint32_t executionPrice;
 };
@@ -62,7 +62,6 @@ struct TradeMessage {
     uint32_t shares;
     char stock[8];
     uint32_t price;
-    uint64_t matchNumber;
 };
 
 // ITCH MESSAGE GENERATOR HELPER FUNCTIONS
@@ -75,7 +74,7 @@ TradeMessage generateTradeMessage();
 
 // OTHER HELPER FUNCTIONS
 uint64_t getNanoSecondsSinceMidnight();
-char buySellCharRndmzr();
+char charRndmzr(char x, char y);
 uint32_t ranInt32();
 void setRandomTicker(char stock[8]);
 void setRandomOrderId(uint64_t &x);
