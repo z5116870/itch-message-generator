@@ -2,9 +2,12 @@
 #include <iostream>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <constants.hpp>
-#include <generator.h>
 #include <unistd.h>
+
+#include "generator.h"
+
+#define MULTICAST_IP "239.1.1.1"
+#define PORT 30001
 
 int main()
 {
@@ -37,15 +40,18 @@ int main()
         perror("Failed to create binary form of IPv4 multicast address.\n");
     }
 
+    std::cout << "Setup socket and dest addr succesfully.\n";
+
     // Send data to socket
     while(1) {
         AddOrderMessage a = generateAddOrderMessage();
+        std::cout << "created test message\n";
         ssize_t sent = sendto(sockfd, &a, sizeof(a), 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
 
         if(sent < 0) {
             perror("Could not send data");
         } else {
-            fprintf(stdout, "Sent message of size %d and type %c", sizeof(a), a.messageType);
+            fprintf(stdout, "Sent message of size %ld and type %c", sizeof(a), a.messageType);
         }
         sleep(1);
     }
