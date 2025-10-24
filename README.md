@@ -55,6 +55,7 @@ Example command-line build:
 git clone https://github.com/z5116870/itch-message-generator.git
 cd itch-message-generator
 g++ -std=c++11 main.cpp messages.cpp helper.cpp -o itch_gen
+```
 If you use CMake, create a minimal CMakeLists.txt including the above sources.
 
 ### Running
