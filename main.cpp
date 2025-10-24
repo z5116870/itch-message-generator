@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "generator.h"
+#include "messages.h"
 
 #define MULTICAST_IP "239.1.1.1"
 #define PORT 30001
@@ -44,14 +44,15 @@ int main()
 
     // Send data to socket
     while(1) {
-        AddOrderMessage a = generateAddOrderMessage();
+        TradeMessage a = TradeMessage(ADD_ORDER);
         ssize_t sent = sendto(sockfd, &a, sizeof(a), 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
 
         if(sent < 0) {
             perror("Could not send data");
         } else {
-            fprintf(stdout, "Sent message of size %ld and type %c, %ld", sizeof(a), a.messageType, a.timestamp);
+            fprintf(stdout, "Sent message of size %ld and type %c, stock %s at time: %llu\n", sizeof(TradeMessage), a.m_messageType, a.m_stock, a.m_timestamp);
         }
+        fflush(stdout);
         sleep(1);
     }
     return 0;
