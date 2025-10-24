@@ -18,8 +18,6 @@ It’s designed for local testing or simulation of market-data–style traffic, 
   - [UDP / Multicast Settings](#udp--multicast-settings)
 - [Structure & Code Overview](#structure--code-overview)
 - [Dependencies](#dependencies)
-- [Extending / Customising](#extending--customising)
-- [Licence & Contributing](#licence--contributing)
 
 ---
 
@@ -59,7 +57,7 @@ cd itch-message-generator
 g++ -std=c++11 main.cpp messages.cpp helper.cpp -o itch_gen
 If you use CMake, create a minimal CMakeLists.txt including the above sources.
 
-Running
+### Running
 bash
 Copy code
 ./itch_gen <multicast_address> <port>
@@ -70,7 +68,7 @@ Copy code
 ./itch_gen 239.0.0.1 5000
 The program will start generating ITCH messages and broadcasting them to the provided multicast address and port.
 
-Usage
+## Usage
 Configuration
 Modify parameters in the source (e.g., helper.h, messages.h) to set:
 
@@ -80,19 +78,19 @@ Message types and generation rates
 
 Payload structure (IDs, sizes, prices, etc.)
 
-Message Generation
+### Message Generation
 messages.cpp and messages.h define the ITCH message formats and serialization logic.
 Each message corresponds to a protocol type, with fields like order ID, timestamp, and price.
 main.cpp orchestrates message creation and sending.
 
-UDP / Multicast Settings
+### UDP / Multicast Settings
 Ensure your OS/network allows sending to multicast groups
 
 Use a receiver listening on the same multicast IP/port
 
 Adjust TTL or loopback options as needed
 
-Structure & Code Overview
+## Structure & Code Overview
 bash
 Copy code
 itch-message-generator/
@@ -100,6 +98,7 @@ itch-message-generator/
 ├── messages.h/.cpp  # ITCH message type definitions and serialization
 ├── helper.h/.cpp    # Utility functions (networking, random data, timestamps)
 └── README.md        # Project documentation
+
 File Details
 main.cpp – Initializes multicast UDP socket, runs message-generation loop.
 
@@ -107,45 +106,10 @@ messages.h / .cpp – Defines message structures and encoding logic.
 
 helper.h / .cpp – Provides networking utilities and helper functions.
 
-Dependencies
+## Dependencies
 Standard C++ library
 
 BSD sockets (Linux/macOS) or Winsock (Windows)
 
 No external libraries required
 
-Extending / Customising
-You can extend this project by:
-
-Adding new ITCH message types in messages.h/.cpp
-
-Adjusting generation frequency or payload fields
-
-Logging messages to file or PCAP for analysis
-
-Switching from multicast to TCP for testing
-
-Licence & Contributing
-Feel free to fork and modify this project.
-License: (Add your chosen license, e.g., MIT, BSD, or Apache 2.0)
-
-Contributions and pull requests are welcome!
-
-Dependency / Architecture Graph
-Module Dependency Diagram
-mermaid
-Copy code
-graph TD
-    A[main.cpp] --> B[helper.h/.cpp]
-    A --> C[messages.h/.cpp]
-    C --> B
-Data Flow Overview
-text
-Copy code
-User config
-    ↓
- main.cpp  →  messages module  →  serialize message
-    ↓                             ↓
- helper module → send via UDP → multicast network
-Author: z5116870
-Repository: itch-message-generator
