@@ -14,4 +14,4 @@ uint64_t getNanoSecondsSinceMidnight();
 char charRndmzr(char x, char y);
 uint32_t ranInt32();
 void setRandomTicker(char stock[8]);
-void setRandomOrderId(uint64_t &x);
+void setRandomFromVec(uint64_t &x, const std::vector<uint64_t> &vec);

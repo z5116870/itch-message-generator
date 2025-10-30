@@ -3,7 +3,6 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
 #include "messages.h"
 
 #define MULTICAST_IP "239.1.1.1"
@@ -44,14 +43,16 @@ int main()
 
     // Send data to socket
     while(1) {
-        TradeMessage a = TradeMessage(ADD_ORDER);
+        TradeMessage a = TradeMessage();
+        // Message a = generateMessage()
         ssize_t sent = sendto(sockfd, &a, sizeof(a), 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
 
         if(sent < 0) {
             perror("Could not send data");
         } else {
-            fprintf(stdout, "Sent message of size %ld and type %c, stock %s at time: %llu\n", sizeof(TradeMessage), a.m_messageType, a.m_stock, a.m_timestamp);
+            std::cout << a;
         }
+        
         fflush(stdout);
         sleep(1);
     }

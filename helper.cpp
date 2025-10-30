@@ -2,7 +2,6 @@
 #include <random>
 #include <cstring>
 #include <chrono>
-#include <vector>
 #include <iostream>
 
 // HELPER FUNCTIONS
@@ -13,7 +12,6 @@ uint64_t getNanoSecondsSinceMidnight() {
     auto midnight = floor<days>(now);
     auto delta = now - midnight;
     uint64_t nano = duration_cast<nanoseconds>(delta).count();
-    std::cout << nano << std::endl;
     return nano;
 }
 
@@ -30,15 +28,15 @@ char charRndmzr(char x, char y) {
     return bit ? x : y;
 }
 
-void setRandomOrderId(uint64_t &x) {
+void setRandomFromVec(uint64_t &x, const std::vector<uint64_t> &vec) {
     std::mt19937 gen(std::random_device{}());
-    if (orderIds.empty()) {
-        perror("The orderIds array is empty!");
+    if (!vec.size()) {
+        perror("Vector is empty.");
         exit(EXIT_FAILURE);
     };
-    std::uniform_int_distribution<int> dist(0,orderIds.size() - 1);
+    std::uniform_int_distribution<int> dist(0,vec.size() - 1);
     int idx = dist(gen);
-    x = orderIds[dist(gen)];
+    x = vec[dist(gen)];
 }
 
 void setRandomTicker(char stock[8]) {
