@@ -15,3 +15,16 @@ char charRndmzr(char x, char y);
 uint32_t ranInt32();
 void setRandomTicker(char stock[8]);
 void setRandomFromVec(uint64_t &x, const std::vector<uint64_t> &vec);
+template<typename T>
+void makeNetworkByteOrder(uint8_t *buf, size_t &offset, T val, size_t len = sizeof(T)) {
+    // Stores bytes from MSB to LSB, regardless of architecture
+    for(int i = len - 1; i >= 0; i--) 
+        buf[offset++] = (val >> (i * 8)) & 0xFF;
+    
+}
+
+inline void serialize32(uint8_t *buf, size_t &offset, uint32_t val) {
+    uint32_t netByteOrder = htonl(val);
+    memcpy(buf + offset, &netByteOrder, 4);
+    offset += 4;
+}

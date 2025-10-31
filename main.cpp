@@ -4,12 +4,18 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "messages.h"
+#include "generator.h"
 
 #define MULTICAST_IP "239.1.1.1"
 #define PORT 30001
+#define MAX_ITCH_MSG_SIZE 64
+#define LOG(x) std::cout << x << std::endl
+#define SEPARATOR "----------------------"
+#define LOGSERVER(x) LOG(SEPARATOR); LOG(x); LOG(SEPARATOR)
 
 int main()
 {
+    LOGSERVER("STARTING ITCH MESSAGE GENERATOR...");
     // Create a UDP socket for sending byte stream
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) {
@@ -17,6 +23,7 @@ int main()
         return 1;
     }
 
+    LOGSERVER("INITIALISED SOCKET");
     // Set socket options, set to process IPv4 traffic (IPPROTO_IP) with TTL value to 1
     int ttl = 1; // We dont want the packet to be forwarded more than once (outside the local network)
 
@@ -26,6 +33,7 @@ int main()
         return 1;
     }
 
+    LOGSERVER("SET SOCKET OPTIONS SUCCESSFULLY");
     // Setup multicast IP address for sending data
     sockaddr_in dest_addr{};
     dest_addr.sin_family = AF_INET;
@@ -41,20 +49,21 @@ int main()
 
     std::cout << "Setup socket and dest addr succesfully.\n";
 
+    LOGSERVER("STARTING GENERATOR");
+    uint8_t buf[MAX_ITCH_MSG_SIZE];
     // Send data to socket
     while(1) {
-        TradeMessage a = TradeMessage();
+        ssize_t len = generateMessage(buf);
         // Message a = generateMessage()
-        ssize_t sent = sendto(sockfd, &a, sizeof(a), 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
+        ssize_t sent = sendto(sockfd, &buf, len, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
 
         if(sent < 0) {
             perror("Could not send data");
         } else {
-            std::cout << a;
+            std::cout << "Sent bytes: " << len << std::endl;
         }
         
         fflush(stdout);
-        sleep(1);
     }
     return 0;
 }
