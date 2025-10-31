@@ -26,62 +26,82 @@
 // ------------------
 // ITCH MESSAGE TYPES
 // ------------------
+
 // BASE MESSAGE CLASS
+// Message and OrderMessage classes use static polymorphism to allow compile time resolving of 
+// the serialize function -> much faster than virtual functions (no vtable, vptr or indirect
+// function call overhead)
+template<typename DerivedMessage>
 class Message {
 public:
     char        m_messageType;
-    uint64_t    m_timestamp;          // Real value is 6 bytes, but we use 8 for ease of processing
+    uint64_t    m_timestamp;          // We use 8 bytes here, but 6 bytes when serializing
 public:
     Message(char messageType, uint64_t timestamp): m_messageType(messageType), m_timestamp(timestamp){};
     Message() = default;
-    };
+    size_t serialize(uint8_t *buf) {
+        return static_cast<const DerivedMessage*>(this)->implSerialize(buf);
+    }
+};
 
 // BASE ORDERMESSAGE CLASS
-class OrderMessage : public Message {
-protected:
-    uint64_t m_orderRefNumber;
+template<typename DerivedMessage>
+class OrderMessage : public Message<DerivedMessage> {
 public:
-    OrderMessage(char messageType, uint64_t timestamp): Message(messageType, timestamp) {
-        setRandomOrderId(m_orderRefNumber);
+    uint64_t m_orderRefNumber;
+    OrderMessage(char messageType, uint64_t timestamp): Message<DerivedMessage>(messageType, timestamp) {
+        setRandomFromVec(m_orderRefNumber, orderIds);
     };
     OrderMessage() = default;
 };
 
 // TRADE MESSAGE
 // 'A' messageType means its an AddOrder message, 'P' means Trade message
-class TradeMessage : public OrderMessage {
+class TradeMessage : public OrderMessage<TradeMessage> {
 public:
     char        m_buySellIndicator;
     uint32_t    m_shares;
     char        m_stock[8];
     uint32_t    m_price;
 public:
-    TradeMessage(char messageType);
+    TradeMessage();
+    size_t implSerialize(uint8_t *buf) const;
 };
 
 // OTHER ITCH MESSAGES
-class OrderExecutedMessage : public OrderMessage {
-    uint32_t m_executedShares;
+class OrderExecutedMessage : public OrderMessage<OrderExecutedMessage> {
 public:
+    uint32_t m_executedShares;
     OrderExecutedMessage(): OrderMessage(ORDER_EXECUTED, getNanoSecondsSinceMidnight()), m_executedShares(ranInt32()){};
+    size_t implSerialize(uint8_t *buf) const;
 };
 
-struct OrderExecutedWithPriceMessage : public OrderMessage {
+struct OrderExecutedWithPriceMessage : public OrderMessage<OrderExecutedMessage> {
+public:
     uint32_t m_executedShares;
     char m_printable;
     uint32_t m_executionPrice;
-public:
     OrderExecutedWithPriceMessage();
+    size_t implSerialize(uint8_t *buf) const;
 };
 
-struct SystemEventMessage : public Message {
+struct SystemEventMessage : public Message<SystemEventMessage>{
+public:
     char m_eventCode;
-public:
     SystemEventMessage(): Message(SYSTEM_EVENT, getNanoSecondsSinceMidnight()), m_eventCode(charRndmzr(MARKET_OPEN, MARKET_CLOSE)){};
+    size_t implSerialize(uint8_t *buf) const;
 };
 
-struct OrderCancelMessage : public OrderMessage {
-    uint32_t m_cancelledShares;
+struct OrderCancelMessage : public OrderMessage<OrderExecutedMessage> {
 public:
+    uint32_t m_cancelledShares;
     OrderCancelMessage(): OrderMessage(ORDER_CANCELLED, getNanoSecondsSinceMidnight()), m_cancelledShares(ranInt32()){};
+    size_t implSerialize(uint8_t *buf) const;
 };
+
+// MESSAGE OVERLOADS
+std::ostream &operator<<(std::ostream &s, TradeMessage &t);
+std::ostream &operator<<(std::ostream &s, OrderExecutedMessage &t);
+std::ostream &operator<<(std::ostream &s, OrderExecutedWithPriceMessage &t);
+std::ostream &operator<<(std::ostream &s, SystemEventMessage &t);
+std::ostream &operator<<(std::ostream &s, OrderCancelMessage &t);
