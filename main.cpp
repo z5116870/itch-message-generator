@@ -54,15 +54,14 @@ int main()
     // Send data to socket
     while(1) {
         ssize_t len = generateMessage(buf);
-        // Message a = generateMessage()
         ssize_t sent = sendto(sockfd, &buf, len, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
 
         if(sent < 0) {
             perror("Could not send data");
         } else {
-            std::cout << "Sent bytes: " << len << std::endl;
+            std::cout << "Sent bytes: " << len << std::endl << std::endl;
         }
-        
+        sleep(1);
         fflush(stdout);
     }
     return 0;

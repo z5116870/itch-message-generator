@@ -25,10 +25,10 @@ size_t TradeMessage::implSerialize(uint8_t *buf) const {
     // 1. Message Type
     buf[offset++] = m_messageType;
 
-    // 2. Timestamp (big-endian must be preserved)
+    // 2. Timestamp (big-endian must be preserved, 6 bytes)
     makeNetworkByteOrder(buf, offset, m_timestamp, TIMESTAMP_LEN);
 
-    // 3. Order Ref number (8 bytes)
+    // 3. Order Ref number (Use same function, but 8 bytes)
     makeNetworkByteOrder(buf, offset, m_orderRefNumber);
 
     // 4. Buy/Sell Indicator
@@ -109,19 +109,19 @@ std::ostream &operator<<(std::ostream &s, TradeMessage &t) {
     if (t.m_messageType == ADD_ORDER) {
         s <<  " order added ";
     } else s << " trade executed";
-    return s << std::endl;
+    return s;
 }
 
 std::ostream &operator<<(std::ostream &s, OrderExecutedMessage &t) {
     TIMESTAMP_LOG(s, t);
     s << t.m_executedShares << " shares from order no: " << t.m_orderRefNumber << " executed.";
-    return s << std::endl;
+    return s;
 }
 
 std::ostream &operator<<(std::ostream &s, OrderExecutedWithPriceMessage &t) {
     TIMESTAMP_LOG(s, t);
     s << t.m_executedShares << " shares from order no: " << t.m_orderRefNumber << " executed at price: " << t.m_executionPrice;
-    return s << std::endl;
+    return s;
 }
 
 std::ostream &operator<<(std::ostream &s, SystemEventMessage &t) {
@@ -131,11 +131,11 @@ std::ostream &operator<<(std::ostream &s, SystemEventMessage &t) {
     } else if (t.m_eventCode == 'C'){
         s << "MARKET CLOSE";
     }
-    return s << std::endl;
+    return s;
 }
 
 std::ostream &operator<<(std::ostream &s, OrderCancelMessage &t) {
     TIMESTAMP_LOG(s, t);
     s << t.m_cancelledShares << " shares from order no: " << t.m_orderRefNumber << " cancelled.";
-    return s << std::endl;
+    return s;
 }
