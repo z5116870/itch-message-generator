@@ -1,4 +1,5 @@
 // RANDOMLY GENERATE ITCH MESSAGE
+# pragma once
 #include <memory>
 #include <iostream>
 #include <random>

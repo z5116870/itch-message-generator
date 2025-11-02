@@ -39,7 +39,7 @@ public:
 public:
     Message(char messageType, uint64_t timestamp): m_messageType(messageType), m_timestamp(timestamp){};
     Message() = default;
-    size_t serialize(uint8_t *buf) {
+    size_t serialize(uint8_t *buf) const {
         return static_cast<const DerivedMessage*>(this)->implSerialize(buf);
     }
 };
