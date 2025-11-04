@@ -16,20 +16,17 @@ uint64_t getNanoSecondsSinceMidnight() {
 }
 
 uint32_t ranInt32() {
-    std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<uint32_t> dist(0,UINT32_MAX-1);
     return dist(gen);
 }
 
 char charRndmzr(char x, char y) {
-    std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<int> dist(0,1);
     int bit = dist(gen);
     return bit ? x : y;
 }
 
 void setRandomFromVec(uint64_t &x, const std::vector<uint64_t> &vec) {
-    std::mt19937 gen(std::random_device{}());
     if (!vec.size()) {
         perror("Vector is empty.");
         exit(EXIT_FAILURE);
@@ -40,7 +37,6 @@ void setRandomFromVec(uint64_t &x, const std::vector<uint64_t> &vec) {
 }
 
 void setRandomTicker(char stock[8]) {
-    std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<int> dist(0,sizeof(tickers)/sizeof(tickers[0]) - 1);
     int index = dist(gen);
 
