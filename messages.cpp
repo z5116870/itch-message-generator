@@ -13,7 +13,7 @@ TradeMessage::TradeMessage(): OrderMessage(charRndmzr(ADD_ORDER, TRADE), getNano
     m_price = ranInt32();
 };
 
-OrderExecutedWithPriceMessage::OrderExecutedWithPriceMessage(): OrderMessage('X', getNanoSecondsSinceMidnight()) {
+OrderExecutedWithPriceMessage::OrderExecutedWithPriceMessage(): OrderMessage(ORDER_EXECUTED_WITH_PRICE, getNanoSecondsSinceMidnight()) {
     m_executedShares = ranInt32();
     m_printable = charRndmzr(IS_PRINTABLE, IS_NOT_PRINTABLE);
     m_executionPrice = ranInt32();

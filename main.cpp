@@ -17,7 +17,7 @@ int main()
 {
     LOGSERVER("STARTING ITCH MESSAGE GENERATOR...");
     // Create a UDP socket for sending byte stream
-    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0) {
         perror("Failed to initialize a socket.\n");
         return 1;
@@ -51,6 +51,7 @@ int main()
 
     LOGSERVER("STARTING GENERATOR");
     uint8_t buf[MAX_ITCH_MSG_SIZE];
+
     // Send data to socket
     while(1) {
         ssize_t len = generateMessage(buf);

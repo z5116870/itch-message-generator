@@ -3,6 +3,7 @@
 #include <iostream>
 #include "messages.h"
 #define NUM_MESSAGES 5
+#define GENERATOR_LOG 1
 
 // Create array of void function pointers that write to a shared buffer.
 // The shared buffer exists on the main stack, and is passed by pointer
