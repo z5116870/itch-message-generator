@@ -12,6 +12,7 @@
 #define ADD_ORDER 'A'
 #define TRADE 'P'
 #define ORDER_EXECUTED 'E'
+#define ORDER_EXECUTED_WITH_PRICE 'X'
 #define SYSTEM_EVENT 'S'
 #define ORDER_CANCELLED 'C'
 
@@ -39,7 +40,7 @@ public:
 public:
     Message(char messageType, uint64_t timestamp): m_messageType(messageType), m_timestamp(timestamp){};
     Message() = default;
-    size_t serialize(uint8_t *buf) {
+    size_t serialize(uint8_t *buf) const {
         return static_cast<const DerivedMessage*>(this)->implSerialize(buf);
     }
 };
@@ -76,7 +77,7 @@ public:
     size_t implSerialize(uint8_t *buf) const;
 };
 
-struct OrderExecutedWithPriceMessage : public OrderMessage<OrderExecutedMessage> {
+struct OrderExecutedWithPriceMessage : public OrderMessage<OrderExecutedWithPriceMessage> {
 public:
     uint32_t m_executedShares;
     char m_printable;
@@ -92,7 +93,7 @@ public:
     size_t implSerialize(uint8_t *buf) const;
 };
 
-struct OrderCancelMessage : public OrderMessage<OrderExecutedMessage> {
+struct OrderCancelMessage : public OrderMessage<OrderCancelMessage> {
 public:
     uint32_t m_cancelledShares;
     OrderCancelMessage(): OrderMessage(ORDER_CANCELLED, getNanoSecondsSinceMidnight()), m_cancelledShares(ranInt32()){};
