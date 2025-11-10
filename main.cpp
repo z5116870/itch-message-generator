@@ -3,12 +3,18 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <chrono>
+#include <thread>
+
 #include "messages.h"
 #include "generator.h"
 
+// CONSTANTS
 #define MULTICAST_IP "239.1.1.1"
 #define PORT 30001
-#define MAX_ITCH_MSG_SIZE 64
+constexpr ssize_t SEND_BUFFER_SIZE = 1472;
+
+// MACROS
 #define LOG(x) std::cout << x << std::endl
 #define SEPARATOR "----------------------"
 #define LOGSERVER(x) LOG(SEPARATOR); LOG(x); LOG(SEPARATOR)
@@ -50,19 +56,44 @@ int main()
     std::cout << "Setup socket and dest addr succesfully.\n";
 
     LOGSERVER("STARTING GENERATOR");
-    uint8_t buf[MAX_ITCH_MSG_SIZE];
 
-    // Send data to socket
+    // Send message buffer and current position pointer;
+    uint8_t sendBuf[SEND_BUFFER_SIZE];
+    retryBuffer retryBuf;
+    ssize_t pos = 0;
+
+    char addrbuf[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &dest_addr.sin_addr, addrbuf, sizeof(addrbuf));
+    std::cout << "Sending to " << addrbuf 
+          << ":" << ntohs(dest_addr.sin_port)
+          << ", family=" << dest_addr.sin_family << std::endl;
+    // Send data to socket 
     while(1) {
-        ssize_t len = generateMessage(buf);
-        ssize_t sent = sendto(sockfd, &buf, len, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
+        // Write directly to user-space send buffer (sendBuf)
+        // only if writing would not exceed the SEND_BUFFER_SIZE
+        // We also have a retry buffer that stores a copy of the message
+        // that triggers the flush, and this must be the first message written
+        // if it exists
+        if (retryBuf.valid) {
+            pos = 0;
+            memcpy(sendBuf, retryBuf.buf, retryBuf.size);
+            pos += retryBuf.size;
+            retryBuf.valid = 0;
+            continue;
+        }
+
+        // If the retry buffer is not valid, then continue with storage in normal send
+        // buffer (sendBuf)
+        ssize_t len = generateMessage(sendBuf + pos, &retryBuf, SEND_BUFFER_SIZE - pos);
+        ssize_t sent = sendto(sockfd, sendBuf, len, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
+        pos += len; // update current pos
 
         if(sent < 0) {
             perror("Could not send data");
         } else {
             std::cout << "Sent bytes: " << len << std::endl << std::endl;
         }
-        sleep(1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         fflush(stdout);
     }
     return 0;
