@@ -36,5 +36,5 @@ constexpr std::array<size_t(*)(uint8_t*), NUM_MESSAGES> generators = {
     &msgGen<OrderCancelMessage>
 };
 
-size_t generateMessage(uint8_t *buf, retryBuffer *retryBuf, const size_t &bytesRemaining);
+size_t generateMessage(uint8_t *buf, retryBuffer &retryBuf, const size_t &bytesRemaining);
 

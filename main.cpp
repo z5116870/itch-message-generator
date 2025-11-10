@@ -3,8 +3,6 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <chrono>
-#include <thread>
 
 #include "messages.h"
 #include "generator.h"
@@ -12,7 +10,7 @@
 // CONSTANTS
 #define MULTICAST_IP "239.1.1.1"
 #define PORT 30001
-constexpr size_t SEND_BUFFER_SIZE = 1472;
+constexpr size_t SEND_BUFFER_SIZE = 100;
 
 // MACROS
 #define LOG(x) std::cout << x << std::endl
@@ -67,7 +65,7 @@ int main()
     while(1) {
         // Write directly to user-space send buffer (sendBuf)
         // only if writing would not exceed the SEND_BUFFER_SIZE
-        ssize_t len = generateMessage(sendBuf + pos, &retryBuf, SEND_BUFFER_SIZE - pos);
+        ssize_t len = generateMessage(sendBuf + pos, retryBuf, SEND_BUFFER_SIZE - pos);
         pos += len; // update current pos
 
         // If sendBuf capacity exceeded, the retry buffer (buffer that contains the generatedMessage that was not
@@ -90,7 +88,6 @@ int main()
             std::cin.get();
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         fflush(stdout);
     }
     return 0;
