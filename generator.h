@@ -4,7 +4,7 @@
 #include "messages.h"
 
 #define NUM_MESSAGES 5
-constexpr ssize_t MAX_ITCH_MSG_SIZE = 64;
+constexpr size_t MAX_ITCH_MSG_SIZE = 64;
 
 // Retry buffer struct, for storing the message the triggered the user-space send buffer
 // flush so it can be the first ITCH message written before the next sendto() call
@@ -12,6 +12,7 @@ struct retryBuffer {
     uint8_t buf[MAX_ITCH_MSG_SIZE];
     size_t  size;
     bool    valid;
+    retryBuffer(): size(MAX_ITCH_MSG_SIZE), valid(false) {}; // default constructor
 };
 
 // Create array of void function pointers that write to a shared buffer.
@@ -35,5 +36,5 @@ constexpr std::array<size_t(*)(uint8_t*), NUM_MESSAGES> generators = {
     &msgGen<OrderCancelMessage>
 };
 
-size_t generateMessage(uint8_t *buf, retryBuffer *retryBuf, size_t bytesRemaining);
+size_t generateMessage(uint8_t *buf, retryBuffer *retryBuf, const size_t &bytesRemaining);
 
