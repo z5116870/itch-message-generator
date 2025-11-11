@@ -56,7 +56,8 @@ int main()
 
     LOGSERVER("STARTING GENERATOR");
 
-    // Keep these buffers cache aligned 
+    // Keep these buffers cache aligned, avoiding false sharing as well
+    // This can also be avoided by pinning threads to a core
     // Send message buffer (we wont use the entire space, but prevents overflowing)
     alignas(64) uint8_t sendBuf[3000];
 
@@ -89,7 +90,7 @@ int main()
             // Copy in retry buffer contents before next generateMessage
             memcpy(sendBuf, retryBuf.buf, retryBuf.size);
             pos = len;
-            std::cin.get();
+            std::cout << "SN: " << GlobalMessageState::sequenceNumber << std::endl;
         }
 
         fflush(stdout);
