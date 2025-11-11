@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <chrono>
 #include "messages.h"
 #include "generator.h"
 
@@ -11,14 +12,18 @@
 #define MAX_ITCH_MSG_SIZE 64
 #define LOG(x) std::cout << x << std::endl
 #define SEPARATOR "----------------------"
-#define LOGSERVER(x) LOG(SEPARATOR); LOG(x); LOG(SEPARATOR)
+#define LOGSERVER(x) \
+    LOG(SEPARATOR);  \
+    LOG(x);          \
+    LOG(SEPARATOR)
 
 int main()
 {
     LOGSERVER("STARTING ITCH MESSAGE GENERATOR...");
     // Create a UDP socket for sending byte stream
     int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sockfd < 0) {
+    if (sockfd < 0)
+    {
         perror("Failed to initialize a socket.\n");
         return 1;
     }
@@ -40,30 +45,50 @@ int main()
     dest_addr.sin_port = htons(PORT); // Convert host (little/big endian) to big endian (network order)
     int rcode = inet_pton(AF_INET, MULTICAST_IP, &dest_addr.sin_addr);
 
-    if (rcode == 0) {
+    if (rcode == 0)
+    {
         fprintf(stderr, "Binary form of IPv4 multicast address %s not converted properly.\n", MULTICAST_IP);
         return 1;
-    } else if (rcode == -1) {
+    }
+    else if (rcode == -1)
+    {
         perror("Failed to create binary form of IPv4 multicast address.\n");
     }
 
     std::cout << "Setup socket and dest addr succesfully.\n";
 
     LOGSERVER("STARTING GENERATOR");
-    uint8_t buf[MAX_ITCH_MSG_SIZE];
+    uint8_t buf[3000];
 
-    // Send data to socket
-    while(1) {
+    auto now = std::chrono::steady_clock::now();
+    int sendSize = 0;
+    int i = 0;
+    long long time_taken = 0;
+    const int targetSize = 1472;
+
+    while (i < 100)
+    {
         ssize_t len = generateMessage(buf);
-        ssize_t sent = sendto(sockfd, &buf, len, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
+        ssize_t sent = sendto(sockfd, buf, len, 0, (sockaddr *)&dest_addr, sizeof(dest_addr));
 
-        if(sent < 0) {
+        if (sent < 0)
+        {
             perror("Could not send data");
-        } else {
-            std::cout << "Sent bytes: " << len << std::endl << std::endl;
+            continue;
         }
-        sleep(1);
-        fflush(stdout);
+
+        sendSize += len;
+
+        if (sendSize >= targetSize)
+        {
+            auto end = std::chrono::steady_clock::now();
+            time_taken += std::chrono::duration_cast<std::chrono::nanoseconds>(end - now).count();
+            sendSize = 0;
+            i++;
+            now = std::chrono::steady_clock::now();
+        }
     }
+
+    std::cout << "Old implementation avg time taken: " << (time_taken / 100) << " ns" << std::endl;
     return 0;
 }
