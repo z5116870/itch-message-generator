@@ -2,7 +2,7 @@
 # pragma once
 #include <iostream>
 #include "messages.h"
-
+#define GENERATOR_LOG 1
 #define NUM_MESSAGES 5
 constexpr size_t MAX_ITCH_MSG_SIZE = 64;
 

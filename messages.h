@@ -35,10 +35,13 @@
 template<typename DerivedMessage>
 class Message {
 public:
-    char        m_messageType;
-    uint64_t    m_timestamp;          // We use 8 bytes here, but 6 bytes when serializing
+    char                        m_messageType;
+    uint64_t                    m_timestamp;          // We use 8 bytes here, but 6 bytes when serializing
 public:
-    Message(char messageType, uint64_t timestamp): m_messageType(messageType), m_timestamp(timestamp){};
+    Message(char messageType, uint64_t timestamp): m_messageType(messageType), m_timestamp(timestamp){
+        // Increment the sequence number, then store it.
+        ++GlobalMessageState::sequenceNumber;
+    };
     Message() = default;
     size_t serialize(uint8_t *buf) const {
         return static_cast<const DerivedMessage*>(this)->implSerialize(buf);

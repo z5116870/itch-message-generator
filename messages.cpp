@@ -1,8 +1,7 @@
 #include <iostream>
 #include "messages.h"
 #include "helper.h"
-#define TIMESTAMP_LOG(s, t) s <<  "timestamp: " << t.m_timestamp << std::endl
-#define TIMESTAMP_LEN 6
+#define TIMESTAMP_LOG(s, t) s <<  "timestamp: " << t.m_timestamp << " | SN: " << GlobalMessageState::sequenceNumber << std::endl;
 
 // CLASS METHOD DEFINITIONS
 // CONSTRUCTORS
@@ -22,39 +21,36 @@ OrderExecutedWithPriceMessage::OrderExecutedWithPriceMessage(): OrderMessage(ORD
 // SERIALIZE FUNCTIONS
 size_t TradeMessage::implSerialize(uint8_t *buf) const {
     size_t offset = 0;
-    // 1. Message Type
-    buf[offset++] = m_messageType;
 
-    // 2. Timestamp (big-endian must be preserved, 6 bytes)
-    makeNetworkByteOrder(buf, offset, m_timestamp, TIMESTAMP_LEN);
+    // 1, 2 & 3 (Message Type, Timestamp & Sequence Number)
+    serializeBaseMembers(buf, offset, m_messageType, m_timestamp);
 
-    // 3. Order Ref number (Use same function, but 8 bytes)
+    // 4. Order Ref number (Use same function, but 8 bytes)
     makeNetworkByteOrder(buf, offset, m_orderRefNumber);
 
-    // 4. Buy/Sell Indicator
+    // 5. Buy/Sell Indicator
     buf[offset++] = m_buySellIndicator;
 
-    // 5. Shares Bought/Buying
+    // 6. Shares Bought/Buying
     serialize32(buf, offset, m_shares);
 
-    // 6. Stock Name
+    // 7. Stock Name
     memcpy(buf + offset, &m_stock, 8);
     offset += 8;
 
-    // 7. Price 
+    // 8. Price 
     serialize32(buf, offset, m_price);
 
-    // Return size (32 bytes)
+    // Return size
     return offset;
 }
 
 size_t OrderExecutedMessage::implSerialize(uint8_t *buf) const {
     size_t offset = 0;
-    buf[offset++] = m_messageType;
-    makeNetworkByteOrder(buf, offset, m_timestamp, TIMESTAMP_LEN);
+    serializeBaseMembers(buf, offset, m_messageType, m_timestamp);
     makeNetworkByteOrder(buf, offset, m_orderRefNumber);
 
-    // 4. Executed Shares
+    // 5. Executed Shares
     serialize32(buf, offset, m_executedShares);
 
     return offset;
@@ -62,17 +58,16 @@ size_t OrderExecutedMessage::implSerialize(uint8_t *buf) const {
 
 size_t OrderExecutedWithPriceMessage::implSerialize(uint8_t *buf) const {
     size_t offset = 0;
-    buf[offset++] = m_messageType;
-    makeNetworkByteOrder(buf, offset, m_timestamp, TIMESTAMP_LEN);
+    serializeBaseMembers(buf, offset, m_messageType, m_timestamp);
     makeNetworkByteOrder(buf, offset, m_orderRefNumber);
 
-    // 4. Executed Shares
+    // 5. Executed Shares
     serialize32(buf, offset, m_executedShares);
 
-    // 5. Printable?
+    // 6. Printable?
     buf[offset++] = m_printable;
 
-    // 6. Execution Price
+    // 7. Execution Price
     serialize32(buf, offset, m_executionPrice);
 
     return offset;
@@ -80,10 +75,9 @@ size_t OrderExecutedWithPriceMessage::implSerialize(uint8_t *buf) const {
 
 size_t SystemEventMessage::implSerialize(uint8_t *buf) const {
     size_t offset = 0;
-    buf[offset++] = m_messageType;
-    makeNetworkByteOrder(buf, offset, m_timestamp, TIMESTAMP_LEN);
+    serializeBaseMembers(buf, offset, m_messageType, m_timestamp);
 
-    // 4. Event Code
+    // 5. Event Code
     buf[offset++] = m_eventCode;
 
     return offset;
@@ -91,11 +85,10 @@ size_t SystemEventMessage::implSerialize(uint8_t *buf) const {
 
 size_t OrderCancelMessage::implSerialize(uint8_t *buf) const {
     size_t offset = 0;
-    buf[offset++] = m_messageType;
-    makeNetworkByteOrder(buf, offset, m_timestamp, TIMESTAMP_LEN);
+    serializeBaseMembers(buf, offset, m_messageType, m_timestamp);
     makeNetworkByteOrder(buf, offset, m_orderRefNumber);
 
-    // 4. Cancelled Shares
+    // 5. Cancelled Shares
     serialize32(buf, offset, m_cancelledShares);
 
     return offset;

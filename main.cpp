@@ -78,7 +78,7 @@ int main()
         // then copy the contens of the retryBuf into the sendBuf, that triggers the flush, and this must be the first message written
         if (!len) {
             // Flush the buffer
-            ssize_t bytesToSend = pos - len;
+            ssize_t bytesToSend = pos;
             ssize_t sent = sendto(sockfd, sendBuf, bytesToSend, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
             if(sent < 0) {
                 perror("Could not send data");
@@ -88,7 +88,7 @@ int main()
 
             // Copy in retry buffer contents before next generateMessage
             memcpy(sendBuf, retryBuf.buf, retryBuf.size);
-            pos = len;
+            pos = retryBuf.size; // send buffer should now start filling from AFTER the retry message
             std::cin.get();
         }
 

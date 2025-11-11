@@ -11,7 +11,7 @@ ssize_t generateMessage(uint8_t *buf, retryBuffer &retryBuf, const size_t &bytes
         // Copy the last written message
         memcpy(retryBuf.buf, buf, msgLen);
         retryBuf.size = msgLen;
-        //std::cout << "retry write for " << msgLen << " bytes\n";
+        std::cout << "**MESSAGE WRITTEN TO RETRY BUFFER WITH SIZE: " << msgLen << " bytes\n";
         return 0;
     }
 
