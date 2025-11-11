@@ -3,7 +3,6 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <chrono>
 
 #include "messages.h"
 #include "generator.h"
@@ -67,9 +66,6 @@ int main()
     // Position counter
     ssize_t pos = 0;
 
-    auto start = std::chrono::steady_clock::now();
-    long long totalTimeNs = 0;
-    int i = 0;
     // Send data to socket 
     while(1) {
         // Write directly to user-space send buffer (sendBuf)
@@ -84,24 +80,19 @@ int main()
             // Flush the buffer
             ssize_t bytesToSend = pos - len;
             ssize_t sent = sendto(sockfd, sendBuf, bytesToSend, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
-            auto end = std::chrono::steady_clock::now();
             if(sent < 0) {
                 perror("Could not send data");
             } else {
-                //std::cout << "Sent bytes: " << bytesToSend << std::endl << std::endl;
+                std::cout << "Sent bytes: " << bytesToSend << std::endl << std::endl;
             }
 
             // Copy in retry buffer contents before next generateMessage
             memcpy(sendBuf, retryBuf.buf, retryBuf.size);
             pos = len;
-            totalTimeNs += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-            start = std::chrono::steady_clock::now();
-            i++;
-            if (i > 100) break;
+            std::cin.get();
         }
 
+        fflush(stdout);
     }
-
-    std::cout << "New implementation time taken: " << totalTimeNs/100 << std::endl;
     return 0;
 }
