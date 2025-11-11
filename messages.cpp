@@ -1,7 +1,7 @@
 #include <iostream>
 #include "messages.h"
 #include "helper.h"
-#define TIMESTAMP_LOG(s, t) s <<  "timestamp: " << t.m_timestamp << std::endl
+#define TIMESTAMP_LOG(s, t) s <<  "timestamp: " << t.m_timestamp << " | SN: " << GlobalMessageState::sequenceNumber << std::endl;
 
 // CLASS METHOD DEFINITIONS
 // CONSTRUCTORS
@@ -41,7 +41,7 @@ size_t TradeMessage::implSerialize(uint8_t *buf) const {
     // 8. Price 
     serialize32(buf, offset, m_price);
 
-    // Return size (32 bytes)
+    // Return size
     return offset;
 }
 

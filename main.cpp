@@ -56,8 +56,7 @@ int main()
 
     LOGSERVER("STARTING GENERATOR");
 
-    // Keep these buffers cache aligned, avoiding false sharing as well
-    // This can also be avoided by pinning threads to a core
+    // Keep these buffers cache aligned 
     // Send message buffer (we wont use the entire space, but prevents overflowing)
     alignas(64) uint8_t sendBuf[3000];
 
@@ -79,7 +78,7 @@ int main()
         // then copy the contens of the retryBuf into the sendBuf, that triggers the flush, and this must be the first message written
         if (!len) {
             // Flush the buffer
-            ssize_t bytesToSend = pos - len;
+            ssize_t bytesToSend = pos;
             ssize_t sent = sendto(sockfd, sendBuf, bytesToSend, 0, (sockaddr*) &dest_addr, sizeof(dest_addr));
             if(sent < 0) {
                 perror("Could not send data");
@@ -89,8 +88,8 @@ int main()
 
             // Copy in retry buffer contents before next generateMessage
             memcpy(sendBuf, retryBuf.buf, retryBuf.size);
-            pos = len;
-            std::cout << "SN: " << GlobalMessageState::sequenceNumber << std::endl;
+            pos = retryBuf.size; // send buffer should now start filling from AFTER the retry message
+            std::cin.get();
         }
 
         fflush(stdout);
