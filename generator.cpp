@@ -11,11 +11,11 @@ ssize_t generateMessage(uint8_t *buf, retryBuffer &retryBuf, const size_t &bytes
         // Copy the last written message
         memcpy(retryBuf.buf, buf, msgLen);
         retryBuf.size = msgLen;
-        std::cout << "retry write for " << msgLen << " bytes\n";
+        //std::cout << "retry write for " << msgLen << " bytes\n";
         return 0;
     }
 
-    std::cout << "bytes remaining: " << bytesRemaining << std::endl;
-    std::cout << "normal write\n";
+    // std::cout << "bytes remaining: " << bytesRemaining << std::endl;
+    // std::cout << "normal write\n";
     return msgLen;
 }
