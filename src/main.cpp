@@ -56,12 +56,13 @@ int main()
 
     LOGSERVER("STARTING GENERATOR");
 
-    // Keep these buffers cache aligned 
+    // Keep these buffers aligned to cache block size (prevent false sharing, which
+    // isnt a concern right now but will be once multithreading is incorporated) 
     // Send message buffer (we wont use the entire space, but prevents overflowing)
     alignas(64) uint8_t sendBuf[3000];
 
     // Retry buffer
-    alignas(64) retryBuffer retryBuf;
+    alignas(64) RetryBuffer retryBuf;
 
     // Position counter
     ssize_t pos = 0;
