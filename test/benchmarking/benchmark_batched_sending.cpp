@@ -80,10 +80,12 @@ int main()
 
     auto end = std::chrono::steady_clock::now();
     long long totalTimeNs = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    std::chrono::duration<double> time_taken_sec = end - start;
 
     std::cout << "=== RESULTS ===\n";
     printf("ITCH messages sent: %u\n", GlobalMessageState::sequenceNumber);
     printf("Total time taken: %llu ns\n", totalTimeNs);
     printf("Average time taken (per message sent): %llu ns\n", totalTimeNs/ITCH_MESSAGES_TO_SEND);
+    std::cout << "Throughput " << GlobalMessageState::sequenceNumber / time_taken_sec.count() << " messages/sec\n";
     return 0;
 }

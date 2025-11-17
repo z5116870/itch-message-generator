@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <chrono>
+#include <thread>
 #include "messages.h"
 #include "generator.h"
 
@@ -62,12 +63,15 @@ int main()
             perror("Could not send data");
             continue;
         }
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     auto end = std::chrono::steady_clock::now();
     auto time_taken = std::chrono::duration_cast<std::chrono::nanoseconds>(end - now).count();
+    std::chrono::duration<double> time_taken_sec = end - now;
     std::cout << "=== RESULTS ===\n";
     std::cout << "ITCH messages sent: " << GlobalMessageState::sequenceNumber << std::endl;
     std::cout << "Total time taken: " << time_taken << " ns" << std::endl;
     std::cout << "Average time taken (per message sent): " << (time_taken / ITCH_MESSAGES_TO_SEND) << " ns" << std::endl;
+    std::cout << "Throughput " << GlobalMessageState::sequenceNumber / time_taken_sec.count() << " messages/sec\n";
     return 0;
 }

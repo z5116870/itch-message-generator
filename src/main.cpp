@@ -90,7 +90,6 @@ int main()
             // Copy in retry buffer contents before next generateMessage
             memcpy(sendBuf, retryBuf.buf, retryBuf.size);
             pos = retryBuf.size; // send buffer should now start filling from AFTER the retry message
-            std::cin.get();
         }
 
         fflush(stdout);
