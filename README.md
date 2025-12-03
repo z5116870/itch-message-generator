@@ -56,15 +56,15 @@ g++ -std=c++20 main.cpp messages.cpp helper.cpp -o itch_gen
 ```
 
 ### Running
-bash
-Copy code
+```bash
 ./itch_gen <multicast_address> <port>
 Example:
+```
 
-bash
-Copy code
+```bash
 ./itch_gen 239.0.0.1 5000
 The program will start generating ITCH messages and broadcasting them to the provided multicast address and port.
+```
 
 ## Usage
 Configuration
@@ -89,13 +89,13 @@ Use a receiver listening on the same multicast IP/port
 Adjust TTL or loopback options as needed
 
 ## Structure & Code Overview
-bash
-Copy code
+```bash
 itch-message-generator/
 ├── main.cpp         # Entry point: sets up generator, network socket, loop
 ├── messages.h/.cpp  # ITCH message type definitions and serialization
 ├── helper.h/.cpp    # Utility functions (networking, random data, timestamps)
 └── README.md        # Project documentation
+```
 
 File Details
 main.cpp – Initializes multicast UDP socket, runs message-generation loop.
