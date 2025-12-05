@@ -2,7 +2,7 @@
 #include <cstdint>
 #include "generator.h"
 #include "messages.h"
-#include "src/helper.h"
+#include "helper.h"
 
 // ------------------------------------------------------------
 // Tests for generateMessage() functionality
