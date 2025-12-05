@@ -50,21 +50,47 @@ For more details on the message formats used in this application, refer to the [
 Example command-line build:
 
 ```bash
-git clone https://github.com/z5116870/itch-message-generator.git
-cd itch-message-generator/src
-g++ -std=c++20 main.cpp messages.cpp helper.cpp -o itch_gen
+cd build
+cmake ..
+make -j
+sudo ./bin/itch_gen 239.1.1.1 30001
+```
+The program will start generating ITCH messages and broadcasting them to the provided multicast address and port.
+
+### 1. Running Tests
+Option A: Run the test binary directly
+```
+./bin/mdfh_unit_tests
 ```
 
-### Running
-bash
-Copy code
-./itch_gen <multicast_address> <port>
-Example:
+To filter tests:
+```
+./bin/mdfh_unit_tests --gtest_filter=ParseTests.*
+```
 
-bash
-Copy code
-./itch_gen 239.0.0.1 5000
-The program will start generating ITCH messages and broadcasting them to the provided multicast address and port.
+Option B: Run tests via CTest
+```
+ctest -V
+```
+
+Very verbose mode:
+```
+ctest -VV
+```
+### 2. Running Benchmarks
+
+Run:
+```
+./bin/benchmark_multithreading
+```
+
+### 3. Summary
+
+- Run `sudo ./bin/mdfh <MULTICAST_IP> <PORT>`
+- Run `cmake ..` and `make -j` inside build/.
+- Binaries appear in `build/bin/.`
+- Run tests using `ctest -V` or `./bin/mdfh_unit_tests`
+- Run benchmarks using `./bin/benchmark_multithreading`.
 
 ## Usage
 Configuration
@@ -92,11 +118,17 @@ Adjust TTL or loopback options as needed
 Extension of the IMG is planned to support a rerequest server running on a separate thread to allow clients running the MDFH to request lost messages. Requires storing window of all messages. 
 
 ## Structure & Code Overview
-```bash
+```
 itch-message-generator/
-├── main.cpp         # Entry point: sets up generator, network socket, loop
-├── messages.h/.cpp  # ITCH message type definitions and serialization
-├── helper.h/.cpp    # Utility functions (networking, random data, timestamps)
-└── README.md        # Project documentation
+├── build/          # Build directory (binaries in bin/)
+├── docs/           # All docs and diagrams
+├── include/        # Public headers (including inline functions)
+├── screenshots/    # Example outputs, logs, benchmark results or diagrams
+├── src/            # Source code (parsing logic, main, etc.)
+├── test/           # Tests and sample data for parsing / packet handling
+├── .gitignore
+├── CMakeLists.txt
+├── LICENSE
+└── README.md
 ```
 
