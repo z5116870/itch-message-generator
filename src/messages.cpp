@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cstring>
+#include <cstring>
 #include "messages.h"
 #include "helper.h"
 #define TIMESTAMP_LOG(s, t) s <<  "timestamp: " << t.m_timestamp << " | SN: " << GlobalMessageState::sequenceNumber << std::endl;

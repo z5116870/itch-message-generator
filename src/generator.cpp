@@ -1,4 +1,5 @@
 #include "generator.h"
+#include <cstring>
 
 ssize_t generateMessage(uint8_t *buf, RetryBuffer &retryBuf, const size_t &bytesRemaining) {
     // Generator random index

@@ -3,13 +3,13 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <cstring>
+#include <charconv>
 
 #include "messages.h"
 #include "generator.h"
 
 // CONSTANTS
-#define MULTICAST_IP "239.1.1.1"
-#define PORT 30001
 constexpr ssize_t SEND_BUFFER_SIZE = 1472;
 
 // MACROS
@@ -17,10 +17,25 @@ constexpr ssize_t SEND_BUFFER_SIZE = 1472;
 #define SEPARATOR "----------------------"
 #define LOGSERVER(x) LOG(SEPARATOR); LOG(x); LOG(SEPARATOR)
 
-int main()
+int main(int argc, char* argv[])
 {
+    // 1. Affirm command line arguments
+    if (argc < 3) {
+        std::cerr << "Usage: sudo ./itch_gen <MULTICAST_IP> <PORT>\n";
+        return 1;
+    }
+
+    const char *MULTICAST_IP = argv[1];
+    int PORT;
+    auto res = std::from_chars(argv[2], argv[2] + std::strlen(argv[2]), PORT);
+    if (res.ec != std::errc()) {
+        std::cerr << "PORT value not valid" << std::endl;
+        return 1;
+    }
+
     LOGSERVER("STARTING ITCH MESSAGE GENERATOR...");
-    // Create a UDP socket for sending byte stream
+
+    // 2. Create a UDP socket for sending byte stream
     int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0) {
         perror("Failed to initialize a socket.\n");
@@ -28,7 +43,7 @@ int main()
     }
 
     LOGSERVER("INITIALISED SOCKET");
-    // Set socket options, set to process IPv4 traffic (IPPROTO_IP) with TTL value to 1
+    // 3. Set socket options, set to process IPv4 traffic (IPPROTO_IP) with TTL value to 1
     int ttl = 1; // We dont want the packet to be forwarded more than once (outside the local network)
 
     if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) < 0)
@@ -38,7 +53,7 @@ int main()
     }
 
     LOGSERVER("SET SOCKET OPTIONS SUCCESSFULLY");
-    // Setup multicast IP address for sending data
+    // 4. Setup multicast IP address for sending data
     sockaddr_in dest_addr{};
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(PORT); // Convert host (little/big endian) to big endian (network order)
@@ -56,7 +71,7 @@ int main()
 
     LOGSERVER("STARTING GENERATOR");
 
-    // Keep these buffers aligned to cache block size (prevent false sharing, which
+    // 5. Keep these buffers aligned to cache block size (prevent false sharing, which
     // isnt a concern right now but will be once multithreading is incorporated) 
     // Send message buffer (we wont use the entire space, but prevents overflowing)
     alignas(64) uint8_t sendBuf[3000];
@@ -67,7 +82,7 @@ int main()
     // Position counter
     ssize_t pos = 0;
 
-    // Send data to socket 
+    // 6. Send data to socket 
     while(1) {
         // Write directly to user-space send buffer (sendBuf)
         // only if writing would not exceed the SEND_BUFFER_SIZE
