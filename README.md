@@ -60,28 +60,22 @@ The program will start generating ITCH messages and broadcasting them to the pro
 ### 1. Running Tests
 Option A: Run the test binary directly
 ```
-./bin/mdfh_unit_tests
+./bin/itch_unit_tests
 ```
 
 To filter tests:
 ```
-./bin/mdfh_unit_tests --gtest_filter=ParseTests.*
+./bin/mdfh_unit_tests --gtest_filter=><test-file-name>.*
 ```
 
-Option B: Run tests via CTest
+Option B: Run tests via CTest (verbose)
 ```
-ctest -V
+ctest
 ```
 
 Very verbose mode:
 ```
 ctest -VV
-```
-### 2. Running Benchmarks
-
-Run:
-```
-./bin/benchmark_multithreading
 ```
 
 ### 3. Summary
@@ -131,4 +125,3 @@ itch-message-generator/
 ├── LICENSE
 └── README.md
 ```
-
