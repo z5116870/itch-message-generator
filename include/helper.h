@@ -2,6 +2,11 @@
 #include <cstdint>
 #include <vector>
 #include <random>
+#include <cstdint>
+#include <cstring>
+#include <arpa/inet.h>
+#include <random>
+
 
 constexpr size_t TIMESTAMP_LEN = 6;
 inline const std::vector<uint64_t> orderIds = {

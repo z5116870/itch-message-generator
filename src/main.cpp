@@ -3,6 +3,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <cstring>
+#include <charconv>
 
 #include "messages.h"
 #include "generator.h"
