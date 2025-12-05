@@ -88,26 +88,15 @@ Use a receiver listening on the same multicast IP/port
 
 Adjust TTL or loopback options as needed
 
+## Future work
+Extension of the IMG is planned to support a rerequest server running on a separate thread to allow clients running the MDFH to request lost messages. Requires storing window of all messages. 
+
 ## Structure & Code Overview
-bash
-Copy code
+```bash
 itch-message-generator/
 ├── main.cpp         # Entry point: sets up generator, network socket, loop
 ├── messages.h/.cpp  # ITCH message type definitions and serialization
 ├── helper.h/.cpp    # Utility functions (networking, random data, timestamps)
 └── README.md        # Project documentation
-
-File Details
-main.cpp – Initializes multicast UDP socket, runs message-generation loop.
-
-messages.h / .cpp – Defines message structures and encoding logic.
-
-helper.h / .cpp – Provides networking utilities and helper functions.
-
-## Dependencies
-Standard C++ library
-
-BSD sockets (Linux/macOS) or Winsock (Windows)
-
-No external libraries required
+```
 
