@@ -112,14 +112,14 @@ Binary location: after building, the executable is located in build/bin/.
 
 Example:
 ```
-sudo ./build/bin/itch_gen 127.0.0.1 9999
+sudo ./build/bin/itch_gen 239.1.1.1 9999
 ```
 
 This will send a continuous stream of ITCH messages to the specified IP and port.
 
 Then, similarly, run MDFH:
 ```
-sudo ./build/bin/mdfh 127.0.0.1 9999
+sudo ./build/bin/mdfh 239.1.1.1 9999
 ```
 ---
 ## Design Notes
